@@ -10,14 +10,16 @@ public_users.post("/register", (req,res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  if (!(username | password))
+  if (!(username || password))
     return res.status(300).send({error: `username or password are not provided`});
-
-  for (const key in users) {
-    if (users[key].username === username){
-      return res.status(300).send({error: `Username is already exits`});
-    }
-  }
+  
+  if (isValid(username))
+    return res.status(300).send({error: `Username is already exits`});
+  // for (const key in users) {
+  //   if (users[key].username === username){
+  //     return res.status(300).send({error: `Username is already exits`});
+  //   }
+  // }
   users.push({username : username , password : password});
   return res.status(200).send({message:`User ${username} has been added.`});
   
