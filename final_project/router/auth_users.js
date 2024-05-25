@@ -40,8 +40,11 @@ regd_users.post("/login", (req,res) => {
   }
 
   if (authenticatedUser(username,password)){
+    // let accessToken = jwt.sign({data: password},'access',{expiresIn: 60*60})
     let accessToken = jwt.sign({data: password},'access',{expiresIn: 60*60})
     req.session.authorization = {accessToken,username}
+    // console.log(accessToken)
+    console.log(req.session.authorization)
     return res.status(200).json({message : "Login sucessfully"});
   } else {
     return res.status(208).json({message: "Invalid Login. Please check username and password"})
@@ -52,7 +55,20 @@ regd_users.post("/login", (req,res) => {
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  let username = req.session.authorization["username"]
+  let isbn = req.params.isbn
+  let review = books[isbn].reviews[username]
+  let newReview = req.body.review
+
+  if (!review) {
+    // cannot update
+    let review = books[isbn].reviews[username]
+    review = newReview
+    return res.send({message:"Already create review.",reviews:review})
+  } else {
+    review = newReview
+    return res.send({message:"Already updated review.",reviews:review})
+  }
 });
 
 module.exports.authenticated = regd_users;
