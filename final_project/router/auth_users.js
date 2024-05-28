@@ -71,6 +71,32 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   }
 });
 
+
+regd_users.put("/auth/review2/:isbn", (req, res) => {
+  // Extract username from session
+  const username = req.session.authorization.username;
+
+  // Extract ISBN and new review from request
+  const isbn = req.params.isbn;
+  const newReview = req.body.review;
+
+  // Check if the book exists
+  if (!books[isbn]) {
+    return res.status(404).send({ message: "Book not found." });
+  }
+
+  // Check if the user has already reviewed the book
+  if (books[isbn].reviews[username]) {
+    // Update existing review
+    books[isbn].reviews[username] = newReview;
+    return res.send({ message: "Review updated successfully.", reviews: books[isbn].reviews[username] });
+  } else {
+    // Create a new review
+    books[isbn].reviews[username] = newReview;
+    return res.send({ message: "Review created successfully.", reviews: books[isbn].reviews[username] });
+  }
+});
+
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
